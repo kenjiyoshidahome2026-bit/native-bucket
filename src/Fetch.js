@@ -1,0 +1,82 @@
+import fname2mime from "fname2mime.js";
+import decodeZIP from "decodeZIP.js";
+async function Fetch(url, opts = {}) {
+	const type = ((typeof opts == "string")? opts: opts.type || "file").toLowerCase();
+	const proxy = s => `${PROXY_URL}?url=${encodeURIComponent(s)}`
+	const encoding = (opts.encoding||"utf8").toLowerCase().replace(/[\-\_]/g,"").replace(/shiftjis/,"sjis");
+	const silent = !!opts.silent || console === undefined;
+	let eventTarget = opts.eventTarget || (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : null));
+	if (typeof CustomEvent === 'undefined'||!eventTarget.dispatchEvent) eventTarget = null;
+	const event = (type, detail) => eventTarget && eventTarget.dispatchEvent(new CustomEvent(type, { detail }));
+	let name = opts.name || url.split("/").pop().split("?")[0] || "unknown";
+	let surfix = name.split(".").reverse()[0].toLowerCase();
+	const target = (surfix == "zip" && opts.target)? opts.target: null;
+	if (target) { name = target }; 
+	try {
+		const checkRes = await fetch(`${proxy(url)}&mode=check`);
+		const info = await checkRes.json();//console.log(info);
+		if (!info.exists) { console.warn(`file is not exist: ${url}`); return null; }
+		const targetURL = info.mustUseProxy? proxy(url): url;
+		if (info.supportsRange && target) {
+			const file = await decodeZIP(targetURL, target);
+			if (!file) { console.warn(`file is not exist: ${target} in ${url}`);
+				console.log("zip file includes:", await decodeZIP(targetURL, false));
+			}
+			return await convert(file, type, encoding);
+		}
+		const res = await fetch(targetURL); if (!res.ok) throw new Error(res.status);
+		const reader = res.body.getReader(), chunks = [];
+		const total = parseInt(res.headers.get('Content-Length') || 0, 10) || 0; // NaN対策
+		const totalLength = total? total.toLocaleString(): "(unknown)";
+		silent || console.log(`${url}: contentLength = ${total} bytes ${info.mustUseProxy?"[PROXY]":""}`);
+		const log = len => silent || console.log(` => ${name}: ${len.toLocaleString()} / ${totalLength} bytes`);
+		let loaded = 0, n = 0;
+		event("FetchStart", {name});
+		while (true) {
+			const { done, value } = await reader.read(); if (done) break;
+			chunks.push(value);
+			loaded += value.length;
+			if (++n % 256 === 0) { log(loaded); event("FetchProgress", { name, loaded, total }); }
+		}
+		log(loaded);
+		event("FetchEnd", {name});
+		let rawBlob = new Blob(chunks);
+		const head = new Uint8Array(await rawBlob.slice(0, 2).arrayBuffer());
+		if (head[0] === 0x1f && head[1] === 0x8b) { // Gzipのシグネチャ確認
+			const ds = new DecompressionStream("gzip");
+			rawBlob = await new Response(rawBlob.stream().pipeThrough(ds)).blob();
+			name = name.replace(/\.gz(ip)?$/i, "");
+			silent || console.log(` => ${name}: Decompressed (Gzip)`);
+		}
+		let file = new File([rawBlob], name, {type:fname2mime(name)});
+		if (target) file = await decodeZIP(file, target);
+		return await convert(file, type, encoding);
+	} catch (error) { event("FetchError", {name, error}); throw error; }
+////======================================================================================
+	async function convert(file, type, encoding) { if (!file) return null;
+		if (type === "file") return file
+		if (type === "blob") return new Blob([file], { type: file.type });
+		if (type === "arraybuffer") return await file.arrayBuffer();
+		if (["text","json","xml","html","csv"].includes(type)) {
+			const text = new TextDecoder(encoding).decode(await file.arrayBuffer());
+			return (type === "json")? JSON.parse(text):
+			(type === "xml")? new DOMParser().parseFromString(text, 'text/xml'):
+			(type === "html")? new DOMParser().parseFromString(text, 'text/html'):
+			(type === "csv")? str2csv(text): text;
+		}
+		return file;
+		function str2csv(str) {
+			let a = [[""]], i = 0, j = 0;
+			str.replace(/^\xEF\xBB\xBF/,"")
+			.replace(/\r?\n$/, '').replace(/\,|\r?\n|[^\,\"\r\n][^\,\r\n]*|\"(?:[^\"]|\"\")*\"/g, function(s) {
+				if (s === "\n" || s === "\r\n") a[++i] = [""], j = 0; else if (s === ",") a[i][++j] = "";
+				else if (s.charAt(0) === '"') a[i][j] = s.slice(1, -1).replace(/""/g, '"');
+				else { s = s.replace(/^\s+|\s+$/g, "");
+					a[i][j] = s === "true"? true: s === "false"? false: s === "null"? null:
+					(isNaN(s)||s==="")? s: isFinite(s)? s.match(/e[+-]?\d/i)? s:+s:s;
+				}
+			});
+			return a;
+		};
+	}
+}
