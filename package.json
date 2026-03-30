@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:cdn": "esbuild src/lib/my-cdn-module.ts --bundle --minify --outfile=public/cdn/v1/main.js"
   },
   "dependencies": {
     "next": "16.2.1",
@@ -21,7 +22,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.1",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "wrangler": "^4.78.0"
+    "typescript": "^5"
   }
 }
