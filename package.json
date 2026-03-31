@@ -1,0 +1,16 @@
+{
+  "name": "native-bucket",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.98.0",
+    "terser": "^5.46.1",
+    "vite": "^8.0.1"
+  }
+}
