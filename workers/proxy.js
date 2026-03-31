@@ -2,8 +2,7 @@ export async function proxy(request, env, ctx) {
     const url = new URL(request.url);
     const targetUrl = url.searchParams.get('url');
     const mode = url.searchParams.get('mode');
-    // 1. プリフライト（OPTIONS）リクエストへの回答
-    if (request.method === 'OPTIONS') {
+    if (request.method === 'OPTIONS') { // CORSのプリフライトリクエストに対応
 		return new Response(null, {
 			headers: {
 				'Access-Control-Allow-Origin': '*',
@@ -20,9 +19,7 @@ export async function proxy(request, env, ctx) {
 		});
     }
     try {
-		// 2. 診断モード（mode=check）
-		if (mode === 'check') {
-			// HEADリクエストでヘッダー情報のみ取得
+		if (mode === 'check') { // ターゲットURLの存在確認、CORS対応状況、Rangeリクエスト対応状況をチェック
 			const checkRes = await fetch(targetUrl, { method: 'HEAD' });
 			const hasCors = checkRes.headers.has('access-control-allow-origin');
 			const exists = checkRes.status >= 200 && checkRes.status < 300;
@@ -41,8 +38,7 @@ export async function proxy(request, env, ctx) {
 				url: targetUrl
 			}), { headers: { 'Content-Type': 'application/json','Access-Control-Allow-Origin': '*' }});
 		}
-		// 3. 通常のプロキシ処理（Rangeヘッダーなどをそのまま転送）
-		const response = await fetch(targetUrl, {
+		const response = await fetch(targetUrl, { // ブラウザからのリクエストのメソッド、ヘッダー、ボディをそのまま転送
 			method: request.method,
 			headers: request.headers, // ブラウザからのRangeヘッダーもここに引き継がれる
 			body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : null,
