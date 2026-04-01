@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
-import { cloudflare } from "@cloudflare/vite-plugin";
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+
+// ESM環境（package.jsonのtype:module）でパスを正しく扱うための設定
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const banner = `/*!
  * FileIO.js v1.0.0
@@ -9,7 +13,7 @@ const banner = `/*!
  */`;
 
 export default defineConfig({
-  plugins: [cloudflare()],
+  // エラーの原因となっていた plugins: [cloudflare()] を削除しました
   build: {
     sourcemap: true,
     minify: 'terser',
@@ -20,6 +24,7 @@ export default defineConfig({
       }
     },
     lib: {
+      // ライブラリの入り口となるファイルを指定
       entry: resolve(__dirname, 'src/index.js'), 
       name: 'nativeBucket',
       fileName: 'native-bucket',

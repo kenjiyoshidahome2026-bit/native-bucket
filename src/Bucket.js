@@ -4,7 +4,7 @@ import {encodeZIP} from "./encodeZIP.js";
 export class Bucket {
 	constructor(directory, options = {}) {
 		const globalScope = typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : null);
-		this.baseUrl = BUCKET_URL;
+		this.baseUrl = options.baseUrl ||`https://api.ortho-earth.com/bucket/`;
 		this.directory = directory.replace(/\/$/, "") + "/";
 		this.url = this.baseUrl + this.directory;
 		this.log = !options.silent;

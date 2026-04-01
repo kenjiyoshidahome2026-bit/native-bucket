@@ -2,6 +2,7 @@ import {fname2mime} from "./fname2mime.js";
 import {decodeZIP} from "./decodeZIP.js";
 export async function Fetch(url, opts = {}) {
 	const type = ((typeof opts == "string")? opts: opts.type || "file").toLowerCase();
+	const PROXY_URL = opts.proxy||`https://api.ortho-earth.com/proxy`;
 	const proxy = s => `${PROXY_URL}?url=${encodeURIComponent(s)}`
 	const encoding = (opts.encoding||"utf8").toLowerCase().replace(/[\-\_]/g,"").replace(/shiftjis/,"sjis");
 	const silent = !!opts.silent || console === undefined;

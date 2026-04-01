@@ -1,0 +1,44 @@
+<script type="module">
+    import nativeBucket from './src/index';
+
+    // 本来は自分の Cloudflare Worker の URL を指定します
+    // 未指定の場合はコード内のデフォルト値が使用されます
+    const { Fetch, Bucket, Cache } = nativeBucket();
+
+    async function runDemo() {
+        const targetURL = `https://nlftp.mlit.go.jp/ksj/gml/data/N03/N03-2025/N03-20250101_GML.zip`;
+        console.log("🚀 normal fetch without CORS:", targetURL);
+        try { var zip = await fetch(targetURL);
+        } catch(err) {
+            console.log("=> Fetch Error occurs:", err);
+        }
+        console.log("🚀 Fetch with CORS:", targetURL);
+        var zip = await Fetch(targetURL);
+        console.log("=> Fetched zip file:", zip);
+        console.log("Fetch with CORS:", targetURL);
+ 
+
+        // try {
+        //     await Fetch("")
+        //     // 1. Cache のテスト (IndexedDB)
+        //     const myCache = await Cache("test-db/files");
+        //     await myCache("hello.txt", new Blob(["これはキャッシュのテストです"],{ type: "text/plain" }));
+        //     const cachedData = await myCache("hello.txt");
+        //     console.log("IDBキャッシュ取得成功:", cachedData);
+
+        //     // 2. Bucket のインスタンス作成 (例: 'public-files' ディレクトリ)
+        //     const myBucket = new Bucket("public-files");
+        //     console.log("Bucket インスタンス作成:", myBucket.url);
+
+        //     // 3. ファイルリストの取得（Workerが動いていれば結果が出ます）
+        //     console.log("ファイルリストを取得中...");
+        //     const files = await myBucket.list();
+        //     console.log("取得したファイル一覧:", files);
+
+        // } catch (err) {
+        //     console.error("デモ実行エラー:", err);
+        // }
+    }
+
+    runDemo();
+</script>
