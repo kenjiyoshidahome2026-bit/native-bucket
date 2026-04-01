@@ -1,3 +1,8 @@
-name = "native-bucket-worker"
+name = "native-bucket"
 main = "index.js"
 compatibility_date = "2026-04-01"
+
+# R2 バケットとの紐付け設定を追加します
+[[r2_buckets]]
+binding = "MY_BUCKET"
+bucket_name = "my-native-bucket"

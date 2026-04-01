@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
+import { cloudflare } from "@cloudflare/vite-plugin";
 
 const banner = `/*!
  * FileIO.js v1.0.0
@@ -8,6 +9,7 @@ const banner = `/*!
  */`;
 
 export default defineConfig({
+  plugins: [cloudflare()],
   build: {
     sourcemap: true,
     minify: 'terser',
