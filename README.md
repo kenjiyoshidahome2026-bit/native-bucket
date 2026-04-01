@@ -13,6 +13,9 @@ A lightweight, high-performance web storage and utility library.
     * **Cache**: High-speed browser-side file caching using IndexedDB.
     * **ZIP Support**: Built-in high-performance compression and decompression.
 
+## 🏗 System Architecture
+![Architecture](etc/architecture.png)
+
 ## 📦 Quick Start (CDN)
 
 Simply include the library via a single script tag in your HTML:
