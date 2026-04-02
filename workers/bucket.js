@@ -11,14 +11,14 @@ export async function bucket(request, env) {
     if (request.method === "OPTIONS") {// CORSのプリフライトリクエストに対応
       	return new Response(null, { headers: corsHeaders });
     }
-    if (request.method === "POST") { // POSTリクエストの場合はOriginチェックを行う
-		const origin = request.headers.get("Origin");
-		if (!origin||new URL(origin).hostname !== url.hostname) {
-			return new Response(JSON.stringify({ error: "Forbidden: Missing Origin header." }), { 
-				status: 403,  headers: { ...corsHeaders, "Content-Type": "application/json" } 
-			});
-		}
-    }
+    // if (request.method === "POST") { // POSTリクエストの場合はOriginチェックを行う
+	// 	const origin = request.headers.get("Origin");
+	// 	if (!origin||new URL(origin).hostname !== url.hostname) {
+	// 		return new Response(JSON.stringify({ error: "Forbidden: Missing Origin header." }), { 
+	// 			status: 403,  headers: { ...corsHeaders, "Content-Type": "application/json" } 
+	// 		});
+	// 	}
+    // }
     // --------------------------------------------------
 	try {
 		if (request.method === "GET") { // ?meta=1 クエリでメタデータのみ取得

@@ -2,7 +2,11 @@ name = "native-bucket"
 main = "index.js"
 compatibility_date = "2026-04-01"
 
-# R2 バケットとの紐付け設定を追加します
+# 🚀 静的ファイルの配信設定
+[assets]
+directory = "../demo"
+
+# 🚀 R2バケットのバインド設定（これが抜けていました！）
 [[r2_buckets]]
-binding = "MY_BUCKET"
-bucket_name = "my-native-bucket"
+binding = "MY_BUCKET"          # コード内で env.MY_BUCKET として使われる名前 
+bucket_name = "my-native-bucket" # Cloudflareのダッシュボードで作った実際のバケット名

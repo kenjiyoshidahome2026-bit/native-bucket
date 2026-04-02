@@ -1,3 +1,4 @@
+import {fname2mime} from "./fname2mime.js";
 export async function decodeZIP(source, target = null, encoding = null) {//基本的にencodingは自動判定
 	const safeFetch = async (url, opt) => {
 		try { const r = await fetch(url, opt); return (!r.ok && r.status !== 206) ? null : r; } catch (e) { return null; }
