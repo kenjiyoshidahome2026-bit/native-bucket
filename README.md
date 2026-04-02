@@ -91,6 +91,11 @@ npm run dev
 # Build for production (outputs to /dist)
 npm run build
 ```
+## Technical Highlights
+* Proxy-Aware Fetching: Automatically detects and resolves CORS issues.
+* Virtual ZIP File System: Direct access to ZIP entries without full extraction.
+* R2 Optimized Storage: Automatic Gzip and Multipart Upload for large payloads.
+* IndexedDB Sync: Seamless bridge between Cloud storage and Local cache.
 
 ## 📄 License
 
