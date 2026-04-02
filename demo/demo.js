@@ -85,7 +85,7 @@ async function runStory(event) {
         const t2 = performance.now();
         const extractedFile = await Fetch(targetURL, { target: targetFile, cors: true });
         const d2 = +(performance.now() - t2).toFixed(0);
-        log(`🚀 [RESULT] Smart Extract: <span class="highlight-speed">${d2.toLocaleString()}ms</span>`, "success");
+        log(`🚀 [RESULT] Smart Extract Performance: <span class="highlight-speed">${d2.toLocaleString()}ms</span>`, "success");
         log(`📊 Extracted File Size: ${extractedFile.size.toLocaleString()} bytes`, "info");
         await delay(1000);
 ////-------------------------------------------------------------------------------------------  
@@ -132,9 +132,11 @@ async function runStory(event) {
         const dCGet = (performance.now() - tCGet).toFixed(2);
         log(`✅ Cache Retrieve: ${dCGet} ms`, "success");
 ////-------------------------------------------------------------------------------------------  
-        log("▶ STEP 10: See json on console.", "info");
+        log("▶ STEP 10: Structural Data Recovery (JSON). See json on console.", "info");
         cmd(`console.log(JSON.parse(await cachedFile.text()));`);
-        console.log(JSON.parse(await cachedFile.text()));
+        const geojson = JSON.parse(await cachedFile.text());
+        log(`💎 Verified Features: ${geojson.features.length} entities recovered.`, "success");
+        console.log(geojson);
 ////-------------------------------------------------------------------------------------------  
     } catch (err) {
         log(`🚨 Error: ${err.message}`, "error");
