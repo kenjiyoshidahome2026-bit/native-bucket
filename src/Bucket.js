@@ -60,7 +60,7 @@ export class Bucket {
 		return (allItems || []).map(i => this._conv(i));
 	}
 	async get(name, type = "blob") {
-		this._dispatch("LoadStart", name);
+		this._dispatch("LoadStart", {name});
 		return new Promise((resolve) => {
 			const xhr = new XMLHttpRequest();
 			const handleError = () => { this._dispatch("LoadError", name); resolve(null); };
@@ -68,7 +68,7 @@ export class Bucket {
 			xhr.responseType = "blob";
 			xhr.onprogress = (e) => {
 				const total = e.lengthComputable ? e.total : 0;
-				this._dispatch("LoadProgress", { name: name, loaded: e.loaded, total: total });
+				this._dispatch("LoadProgress", { name, loaded: e.loaded, total });
 				this._log(` => ${name}: ${e.loaded.toLocaleString()}${total? " / "+total.toLocaleString():""} bytes`);
 			};
 			xhr.onload = async () => {
@@ -83,7 +83,7 @@ export class Bucket {
 				this._log(` => total expanded: ${blob.size.toLocaleString()} bytes`);
 				blob = new Blob([blob],{type: fname2mime(name)});
 				blob.name = name;
-				this._dispatch("LoadEnd", name);
+				this._dispatch("LoadEnd", {name, total: blob.size});
 				try {
 					if (type === "json") resolve(JSON.parse(await blob.text()));
 					else if (type === "text") resolve(await blob.text());
@@ -115,6 +115,7 @@ export class Bucket {
 		const { uploadId } = await createRes.json();
 		const parts = [];
 		let partNumber = 1, done = false, buffer = new Uint8Array(0), totalUploaded = 0;
+		this._dispatch("SaveStart", {name});
 		while (!done) {
 			const { value, done: readerDone } = await reader.read();
 			if (value) {
@@ -141,8 +142,8 @@ export class Bucket {
 		}
 		headers = { 'X-Action': 'mp-complete', 'Content-Type': 'application/json' };
 		const completeRes = await fetch(targetUrl, { method: 'POST', headers, body: JSON.stringify({ uploadId, parts }) });
-		this._dispatch("Save", name);
-		return completeRes.ok;
+		this._dispatch("SaveEnd", { name, total: totalUploaded });
+		return completeRes.ok? totalUploaded: 0;
 	}
 	async del(name) {
 		const url = this.url + name.replace(/^\//, "");

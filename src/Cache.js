@@ -1,6 +1,5 @@
 const _cacheTub = {};
 export async function Cache(name) {
-	//this._cacheTub = this._cacheTub || {};
 	const isFile = v => ((v instanceof File) || (v instanceof Blob && v.name));
 	let [dbname, tblname] = name.split(/[\.\/]/); tblname = tblname || dbname;
 ////-------------------------------------------------------------------------------------------
@@ -40,7 +39,7 @@ export async function Cache(name) {
 			req.onsuccess = e => resolve(e.target.result);
 			req.onerror = e => reject(e.target.error);
 		});
-		this._cacheTub[dbname] = db;
+		_cacheTub[dbname] = db;
 	}
 	return (key, val) => val === undefined ? (isFile(key) ? put(key.name, key) : get(key)) : put(key, val);
 }
