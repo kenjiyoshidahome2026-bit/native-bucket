@@ -59,9 +59,9 @@ body { background: $color-bg; color: $color-text;
 .log-entry {
     margin-bottom: 8px; display: flex;
     &.log-cmd { 
-        background: #11141b; margin: 10px 0 20px 130px; padding: 12px; 
+        background: #11141b; margin: 5px 0 10px 130px; padding: 10px; 
         border-left: 4px solid $color-accent; border-radius: 4px;
-        code { color: #58a6ff; }
+        code { color: #58a6ff; font-size: 1.1rem; }
     }
     &.log-error { color: $color-error; }
     &.log-success { color: $color-success; }
@@ -70,6 +70,11 @@ body { background: $color-bg; color: $color-text;
 .log-time {
     color: $color-accent; width: 110px; flex-shrink: 0;
     border-right: 1px solid $color-border; margin-right: 20px;
+}
+
+.log-step {
+    background: $color-accent; color: $color-text; 
+    border: 1px solid $color-text; border-radius: 4px; padding: 2px 8px;
 }
 
 // --- Inline Lists (ZIP exploration) ---
