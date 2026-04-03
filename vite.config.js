@@ -7,7 +7,7 @@ import { dirname } from 'path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
 const banner = `/*!
- * FileIO.js v1.0.0
+ * nativeBucket.js v1.0.0
  * (c) 2026 Kenji Yoshida
  * Released under the MIT License.
  */`;
