@@ -14,7 +14,7 @@ const banner = `/*!
 
 export default defineConfig({
   // エラーの原因となっていた plugins: [cloudflare()] を削除しました
-  base: '/native-bucket/',
+  base: './',
   build: {
     sourcemap: true,
     minify: 'terser',
