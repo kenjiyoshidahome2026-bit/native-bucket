@@ -23,13 +23,10 @@ A lightweight, high-performance web storage and utility library.
 Simply include the library via a single script tag in your HTML:
 
 ```html
-<script src="[https://api.ortho-earth.com/native-bucket.js](https://api.ortho-earth.com/native-bucket.js)"></script>
+<script src="https://api.ortho-earth.com/native-bucket.js"></script>
 <script>
   // Initialize with your custom API endpoints
-  const { Fetch, Bucket, Cache } = nativeBucket(
-    "[https://api.ortho-earth.com/bucket/](https://api.ortho-earth.com/bucket/)",
-    "[https://api.ortho-earth.com/proxy](https://api.ortho-earth.com/proxy)"
-  );
+  const { Fetch, Bucket, Cache } = nativeBucket([your worker address]);
 
   // Example: List files from a bucket
   const myBucket = new Bucket("my-folder");
