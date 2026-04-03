@@ -8,8 +8,10 @@
 
 ---
 
-## ⚡ The Problem: The "1GB+ Wall"
+## ⚡ One stop solution for files using
+
 Traditional web apps struggle with large archives like GIS data:
+
 - **CORS Restrictions**: Remote servers block your `fetch`.
 - **Memory Crashes**: Downloading a 1GB+ ZIP crashes mobile browsers.
 - **Latency**: Repeatedly downloading the same heavy file kills UX.
@@ -17,6 +19,7 @@ Traditional web apps struggle with large archives like GIS data:
 **nativeBucket.js** solves this by orchestrating **Cloudflare R2**, **Edge Proxies**, and **IndexedDB** into a single, high-performance workflow.
 
 ## 🏗 System Architecture
+
 ![Architecture](etc/architecture.png)
 
 ## 🚀 [Live Demo (Performance Story)](https://kenjiyoshidahome2026-bit.github.io/native-bucket/demo/)
@@ -31,9 +34,12 @@ Experience the full lifecycle of data, from a locked remote server to a function
 ## 🚀 Get Started in 5 Minutes
 
 ### 1. Setup Your Storage (Server-Side)
+
 `nativeBucket.js` empowers you to own your data.
+
 1. **Create an R2 Bucket** in your Cloudflare dashboard (e.g., `my-storage`).
 2. **Deploy the Worker**:
+
    ```bash
    cd workers
    # Update wrangler.toml with your bucket name
@@ -41,6 +47,7 @@ Experience the full lifecycle of data, from a locked remote server to a function
    ```
 
 ### 2. Initialize the Library (Client-Side)
+
 ```javascript
 import nativeBucket from './dist/native-bucket.iife.js';
  - or -
@@ -48,10 +55,13 @@ import nativeBucket from './dist/native-bucket.iife.js';
 
 const { Fetch, Bucket, Cache } = nativeBucket("https://your-api.workers.dev");
 ```
+
 ## 🛠 API Reference
 
 ### 🌐 `Fetch(url, options)`
+
 The "CORS-Killer". Fetches and extracts data from anywhere.
+
 - `type`: Output format (`"file"`, `"json"`, `"blob"`, etc.).
 - `target`: Filename to extract if the source is a ZIP.
   ( if target == false, outputs fileList )
@@ -59,7 +69,9 @@ The "CORS-Killer". Fetches and extracts data from anywhere.
 - `event`: eventTerget [winndow|self]
 
 ### 🪣 `Bucket(directory)`
+
 Your personal file system on the R2 Edge.
+
 - `get(name[,type])`: Fast retrieval from R2.
 - `meta(name)` : get meta data of the file (fast).
 - `put(file)`: Parallel upload with auto-compression.
@@ -70,13 +82,16 @@ Your personal file system on the R2 Edge.
 - `puts(zipName, files)`: Extract specific files from a ZIP stored in R2.
 
 ### ⚡ `Cache(name)`
+
 The "Zero-Latency" simple engine using IndexedDB.
+
 ```javascript
 const gisCache = await Cache("map/layers"); // dbname/tablename
 await gisCache(myFile); // Save
 const file = await gisCache("japan.geojson"); // Get
 const geojson = JSON.parse(await file.text());
 ```
+
 ## 📄 License
 
 (c) 2026 Kenji Yoshida. Released under the **MIT License**.
