@@ -8,18 +8,17 @@ export async function bucket(request, env) {
 		"Access-Control-Allow-Headers": "Content-Type, X-Action, X-Metadata-Type, X-Destination, X-Upload-ID, X-Part-Number, X-Content-Encoding",
 		"Access-Control-Expose-Headers": "Content-Length, ETag"
     };
+	const err403 = new Response(JSON.stringify({ error: "Forbidden: Missing Origin header." }), { 
+		status: 403,  headers: { ...corsHeaders, "Content-Type": "application/json" } 
+	});
     if (request.method === "OPTIONS") {// CORSのプリフライトリクエストに対応
       	return new Response(null, { headers: corsHeaders });
     }
-    // if (request.method === "POST") { // POSTリクエストの場合はOriginチェックを行う
-	// 	const origin = request.headers.get("Origin");
-	// 	if (!origin||new URL(origin).hostname !== url.hostname) {
-	// 		return new Response(JSON.stringify({ error: "Forbidden: Missing Origin header." }), { 
-	// 			status: 403,  headers: { ...corsHeaders, "Content-Type": "application/json" } 
-	// 		});
-	// 	}
-    // }
-    // --------------------------------------------------
+    if (request.method === "POST") { // POSTリクエストの場合はOriginチェックを行う
+		const origin = request.headers.get("Origin"); if (!origin) return err403;
+		const host = new URL(origin).hostname;
+		if (host !== url.hostname && host !== "kenjiyoshidahome2026-bit.github.io") return err403;
+    }
 	try {
 		if (request.method === "GET") { // ?meta=1 クエリでメタデータのみ取得
 			const isMeta = url.searchParams.has("meta");

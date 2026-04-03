@@ -4,7 +4,6 @@ import {bucket} from './bucket.js';
 export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
-        // .fetch() を付けず、直接関数として呼び出すのが正しいJavaScriptの書き方です
         if (url.pathname.startsWith('/proxy')) return proxy(request, env, ctx);
         if (url.pathname.startsWith('/bucket')) return bucket(request, env);
         

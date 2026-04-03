@@ -13,7 +13,7 @@ A lightweight, high-performance web storage and utility library.
     * **Cache**: High-speed browser-side file caching using IndexedDB.
     * **ZIP Support**: Built-in high-performance compression and decompression.
 
-## [🚀 Live Demo (Performance Story)](https://kenjiyoshidahome2026-bit.github.io/native-bucket/demo/)
+## 🚀 [Live Demo (Performance Story)](https://kenjiyoshidahome2026-bit.github.io/native-bucket/demo/)
 
 ## 🏗 System Architecture
 ![Architecture](etc/architecture.png)
