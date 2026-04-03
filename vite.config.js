@@ -18,6 +18,12 @@ export default defineConfig({
   build: {
     sourcemap: true,
     minify: 'terser',
+    rollupOptions: {
+      input: {
+        // demo フォルダ内の index.html をメインの入力にする設定
+        main: resolve(__dirname, 'demo/index.html'),
+      },
+    },
     terserOptions: {
       format: {
         comments: /^\!/, // 「!」で始まるコメント（ライセンス等）を残す設定
