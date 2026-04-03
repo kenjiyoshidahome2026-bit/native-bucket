@@ -77,22 +77,6 @@ await gisCache(myFile); // Save
 const file = await gisCache("japan.geojson"); // Get
 const geojson = JSON.parse(await file.text());
 ```
-
-## 📦 Quick Start (CDN)
-
-Simply include the library via a single script tag in your HTML:
-
-```html
-<script src="https://api.ortho-earth.com/native-bucket.js"></script>
-<script>
-  // Initialize with your custom API endpoints
-  const { Fetch, Bucket, Cache } = nativeBucket([your worker address]);
-
-  // Example: List files from a bucket
-  const myBucket = new Bucket("my-folder");
-  myBucket.list().then(console.log);
-</script>
-```
 ## 📄 License
 
 (c) 2026 Kenji Yoshida. Released under the **MIT License**.
