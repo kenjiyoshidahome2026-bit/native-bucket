@@ -1,96 +1,146 @@
-# 📦 nativeBucket.js
+# native-bucket.js (v1.0.0)
 
-> **The Zero-Latency Bridge for Heavy Data.** > Stop waiting for downloads. Start interacting with 1GB+ datasets in milliseconds.
+A high-performance bridge between **Cloudflare Edge (R2/Workers)** and **Browser Storage (IndexedDB)**. Optimized for handling heavy binary datasets (GIS, archives, large assets) with zero-latency interaction.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Cloudflare Workers](https://img.shields.io/badge/Powered_by-Cloudflare_Workers-F38020?logo=cloudflare-workers&logoColor=white)](https://workers.cloudflare.com/)
-[![Vite](https://img.shields.io/badge/Build_with-Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Vite](https://img.shields.io/badge/Build_with-Vite-646CFF?logo=vite&logoColor=white)](<https://vitejs.dev/>)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+![Size](https://img.shields.io/badge/Size-6.6KB-brightgreen.svg)
 
 ---
-
-## ⚡ One stop solution for files using
-
-Traditional web apps struggle with large archives like GIS data:
-
-- **CORS Restrictions**: Remote servers block your `fetch`.
-- **Memory Crashes**: Downloading a 1GB+ ZIP crashes mobile browsers.
-- **Latency**: Repeatedly downloading the same heavy file kills UX.
-
-**nativeBucket.js** solves this by orchestrating **Cloudflare R2**, **Edge Proxies**, and **IndexedDB** into a single, high-performance workflow.
 
 ## 🏗 System Architecture
 
 ![Architecture](etc/architecture.png)
+*Orchestration of data flow across Remote Servers, Edge Proxies, R2 Buckets, and Local Persistent Cache.*
 
-## 🚀 [Live Demo (Performance Story)](https://kenjiyoshidahome2026-bit.github.io/native-bucket/demo/)
+---
 
-Experience the full lifecycle of data, from a locked remote server to a functional local object.
+## 🚀 Server-Side Setup (Cloudflare Workers)
 
-1. **The Bypass**: Seamlessly route through a **Cloudflare Proxy** to defeat CORS.
-2. **Smart Extraction**: Don't download the whole ZIP. We map the remote archive and extract **only the specific file** you need on-the-fly.
-3. **Edge Sync**: Push the extracted file to **Cloudflare R2** with automatic **Gzip** and **Multipart Upload** (>5MB).
-4. **Persistent Cache**: Store the result in **IndexedDB**.
+### 1. Configuration (`wrangler.toml`)
 
-## 🚀 Get Started in 5 Minutes
+Deploy the backend to handle R2 operations and Proxy requests. The `index.js` automatically manages CORS for you.
 
-### 1. Setup Your Storage (Server-Side)
+```toml
+name = "native-bucket-api"
+main = "index.js"
+compatibility_date = "2026-04-01"
 
-`nativeBucket.js` empowers you to own your data.
+[[r2_buckets]]
+# [DO NOT CHANGE] Internal binding for the library
+binding = "MY_BUCKET"
+# [REQUIRED] Your actual R2 bucket name
+bucket_name = "my-r2-storage"
 
-1. **Create an R2 Bucket** in your Cloudflare dashboard (e.g., `my-storage`).
-2. **Deploy the Worker**:
-
-   ```bash
-   cd workers
-   # Update wrangler.toml with your bucket name
-   npx wrangler deploy
-   ```
-
-### 2. Initialize the Library (Client-Side)
-
-```javascript
-import nativeBucket from './dist/native-bucket.iife.js';
- - or -
-<script src="https://cdn.jsdelivr.net/gh/kenjiyoshidahome2026-bit/native-bucket@main/dist/native-bucket.iife.js"></script>
-
-const { Fetch, Bucket, Cache } = nativeBucket("https://your-api.workers.dev");
+[vars]
+# [WHITELIST] Comma-separated domains (Suffix matching supported)
+# Example: "ortho-earth.com,localhost:5173" allows all subdomains of ortho-earth.
+ALLOWED_DOMAINS = "ortho-earth.com,localhost:5173"
 ```
 
-## 🛠 API Reference
+### 2. Deployment
+
+```bash
+cd workers
+npx wrangler deploy
+```
+
+---
+
+## 🛠 Client-Side Setup
+
+### Option A: ESM (Modern Bundlers)
+
+```javascript
+import nativeBucket from './src/index.js';
+```
+
+### Option B: CDN / Global Script (The Easiest Way)
+
+The library automatically attaches to `window.nativeBucket` (or `self.nativeBucket`) for non-ESM or direct HTML environments.
+
+```html
+<script type="module" src="https://cdn.jsdelivr.net/gh/kenjiyoshidahome2026-bit/native-bucket@latest/src/index.js"></script>
+<script>
+  window.addEventListener('load', () => { // Access via global nativeBucket after page load
+    const { Fetch, Bucket, Cache } = nativeBucket("https://your-worker.dev/");
+    ...
+   });
+</script>
+```
+
+---
+
+## 📖 Detailed API Reference
+
+### Initialization
+
+Register your Worker endpoint to unlock the three core modules.
+
+```javascript
+const { Fetch, Bucket, Cache } = nativeBucket("https://your-worker.workers.dev/");
+```
 
 ### 🌐 `Fetch(url, options)`
 
-The "CORS-Killer". Fetches and extracts data from anywhere.
+A smart proxy that bypasses CORS and can surgically extract specific files from remote ZIP archives.
 
-- `type`: Output format (`"file"`, `"json"`, `"blob"`, etc.).
-- `target`: Filename to extract if the source is a ZIP.
-  ( if target == false, outputs fileList )
-- `encoding`: utf8 / shift-jis etc.[utf8]
-- `event`: eventTerget [winndow|self]
+| Parameter | Type | Description |
+| :--- | :--- | :--- |
+| `type` | String | Output format: `"file"` (Default), `"blob"`, `"json"`, `"text"`. |
+| `target` | String | Path inside the ZIP to extract a specific file. |
+| `encoding` | String | encoding (default:`"utf8"`) |
+| `silent` | Boolean | if true then no progress log |
+
+```javascript
+// Extract a file from a remote ZIP as a File object
+const file = await Fetch("https://server.com/data.zip", { target: "layers/japan.geojson" });
+
+console.log(`Received: ${file.name} (${file.size} bytes)`);
+```
 
 ### 🪣 `Bucket(directory)`
 
-Your personal file system on the R2 Edge.
+High-level interface for Cloudflare R2. Features automatic Gzip detection and parallelized Multipart uploads for files >5MB.
 
-- `get(name[,type])`: Fast retrieval from R2.
-- `meta(name)` : get meta data of the file (fast).
-- `put(file)`: Parallel upload with auto-compression.
-- `del(name)` : Delete a file in R2.
-- `move(name, newName)` : Rename a file in R2.
-- `list()` : entire file list
-- `gets(zipName, target)`: Extract specific files from a ZIP stored in R2.
-- `puts(zipName, files)`: Extract specific files from a ZIP stored in R2.
+```javascript
+const storage = Bucket("v1/geodata");
+
+// Upload a File object (Auto-handles multipart if large)
+await storage.put("terrain.bin", fileObject);
+
+// Download as a File object (Auto-decompressed if Gzipped)
+const file = await storage.get("terrain.bin", "file");
+
+// List items in the directory
+const files = await storage.list();
+```
 
 ### ⚡ `Cache(name)`
 
-The "Zero-Latency" simple engine using IndexedDB.
+A persistent Key-Value store powered by IndexedDB. Perfect for instant subsequent loads with **0ms network latency**.
 
 ```javascript
-const gisCache = await Cache("map/layers"); // dbname/tablename
-await gisCache(myFile); // Save
-const file = await gisCache("japan.geojson"); // Get
-const geojson = JSON.parse(await file.text());
+const local = await Cache("assets/v1");
+
+// Save a File/Blob locally (Setter)
+await local("tile_01", blobData);
+
+// Load the File object instantly (Getter)
+const cachedFile = await local("tile_01"); 
 ```
+
+---
+
+## 🔒 Security: Suffix-Matching Whitelist
+
+Access is strictly enforced via the `ALLOWED_DOMAINS` whitelist in `wrangler.toml`.
+
+- **`ortho-earth.com`** matches `ortho-earth.com`, `www.ortho-earth.com`, `dev.ortho-earth.com`, etc.
+- **`localhost:5173`** allows access from your local dev-server.
+
+---
 
 ## 📄 License
 
