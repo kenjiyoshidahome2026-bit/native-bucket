@@ -28,6 +28,7 @@ Experience the zero-latency data flow and surgical ZIP extraction in action:
 ### 1. Configuration (`wrangler.toml`)
 
 Deploy the backend to handle R2 operations and Proxy requests. The `index.js` automatically manages CORS for you.
+Please edit the file: "wrangler.toml" under worker directory.
 
 ```toml
 name = "native-bucket-api"
@@ -38,17 +39,18 @@ compatibility_date = "2026-04-01"
 # [DO NOT CHANGE] Internal binding for the library
 binding = "MY_BUCKET"
 # [REQUIRED] Your actual R2 bucket name
-bucket_name = "my-r2-storage"
+bucket_name = "my-r2-storage" # <=== change here
 
 [vars]
 # [WHITELIST] Comma-separated domains (Suffix matching supported)
 # Example: "ortho-earth.com,localhost:5173" allows all subdomains of ortho-earth.
-ALLOWED_DOMAINS = "ortho-earth.com,localhost:5173"
+ALLOWED_DOMAINS = "ortho-earth.com,localhost:5173" # <=== change here
 ```
 
-### 2. Deployment
+### 2. Deployment with bash in console
 
 ```bash
+bash
 cd workers
 npx wrangler deploy
 ```
@@ -143,10 +145,10 @@ await del.move("text.old.txt");
 // List items in the directory
 const files = await storage.list();
 
-// read a zip file as a files
+// read a zip file as file array
 const strage.gets("name");
 
-// put a zip file from fileArray
+// put a zip file from file array
 const strage.puts(fileArray);
 ```
 
