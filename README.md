@@ -94,48 +94,78 @@ const { Fetch, Bucket, Cache } = nativeBucket("https://your-worker.workers.dev/"
 A smart proxy that bypasses CORS and can surgically extract specific files from remote ZIP archives.
 
 | Parameter | Type | Description |
-| :--- | :--- | :--- |
+| :--- | :---: | :--- |
 | `type` | String | Output format: `"file"` (Default), `"blob"`, `"json"`, `"text"`. |
+| `cors` | Boolean | true/false: pre-flight check widthout this parameter |
 | `target` | String | Path inside the ZIP to extract a specific file. |
 | `encoding` | String | encoding (default:`"utf8"`) |
 | `silent` | Boolean | if true then no progress log |
+| `eventTarget` | dom | target of event (default: window or self[webWorker]) |
 
 ```javascript
-// Extract a file from a remote ZIP as a File object
-const file = await Fetch("https://server.com/data.zip", { target: "layers/japan.geojson" });
+// get en entire renote zip file
+const zip = await Fetch("https://server.com/data.zip");
+console.log(`Received: ${zip.name} (${zip.size} bytes)`);
 
-console.log(`Received: ${file.name} (${file.size} bytes)`);
+// Extract a file from remote ZIP as JSON widthout pre-flight.
+const json = await Fetch("https://server.com/data.zip", { target: "layers/japan.geojson" ,cords:true, type:"json"});
+console.log(`Received: `, json);
 ```
 
-### 🪣 `Bucket(directory)`
+### 🪣 `Bucket(directory, options)`
 
 High-level interface for Cloudflare R2. Features automatic Gzip detection and parallelized Multipart uploads for files >5MB.
 
+| Parameter | Type | Description |
+| :--- | :---: | :--- |
+| `silent` | Boolean | if true then no progress log |
+| `eventTarget` | dom | target of event (default: window or self[webWorker]) |
+
 ```javascript
-const storage = Bucket("v1/geodata");
+const storage = await Bucket("v1/geodata");
+const file = new File(["This is a file"], "test.txt", {type:"text/plain"});
 
 // Upload a File object (Auto-handles multipart if large)
-await storage.put("terrain.bin", fileObject);
+await storage.put(file);
 
 // Download as a File object (Auto-decompressed if Gzipped)
-const file = await storage.get("terrain.bin", "file");
+const file = await storage.get("test.txt");
+
+// get meta information from the File. (size, ETag etc.)
+const meta = await storage.meta("test.txt");
+
+// Rename file
+await storage.move("test.txt", "text.old.txt");
+
+// delete file
+await del.move("text.old.txt");
 
 // List items in the directory
 const files = await storage.list();
+
+// read a zip file as a files
+const strage.gets("name");
+
+// put a zip file from fileArray
+const strage.puts(fileArray);
 ```
 
 ### ⚡ `Cache(name)`
 
-A persistent Key-Value store powered by IndexedDB. Perfect for instant subsequent loads with **0ms network latency**.
+A persistent Key-Value file store powered by IndexedDB. Perfect for instant subsequent loads with **n-ms network latency**.
 
 ```javascript
+// open the database with "dbName/TblName"
 const local = await Cache("assets/v1");
 
-// Save a File/Blob locally (Setter)
-await local("tile_01", blobData);
+// List names in database
+const list = await local();
 
 // Load the File object instantly (Getter)
-const cachedFile = await local("tile_01"); 
+const file = await local("tile_01");
+
+// Save a File locally (Setter)
+await local(file); // or await save(file.name, file)
 ```
 
 ---

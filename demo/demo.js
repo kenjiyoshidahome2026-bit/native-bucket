@@ -109,10 +109,10 @@ async function exec(event) { if (event) event.preventDefault();
         await delay(1000);
     ////-------------------------------------------------------------------------------------------  
         step("Cloud Synchronization (R2 Storage) with gzip");
-        cmd(`myBucket = new Bucket("gis-data");\nawait myBucket.put(file);`);
+        cmd(`const myBucket = await Bucket("gis-data");\nawait myBucket.put(file);`);
         currentPhase = "Compress && Syncing to R2"; 
         progressElement = log(`📡 Progress:`, "warn");
-        const myBucket = Bucket("gis-data");
+        const myBucket = await Bucket("gis-data");
         const t3 = performance.now();
         const size = await myBucket.put(extractedFile);
         const d3 = +(performance.now() - t3).toFixed(0);
