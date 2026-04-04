@@ -152,12 +152,12 @@ const strage.gets("name");
 const strage.puts(fileArray);
 ```
 
-### ⚡ `Cache(name)`
+### ⚡ `Cache(dbName/tableName)`
 
-A persistent Key-Value file store powered by IndexedDB. Perfect for instant subsequent loads with **n-ms network latency**.
+A persistent Key-Value file store powered by IndexedDB. Perfect for instant subsequent loads with **n-ms network latency**. For categorization, several tableNames can be assigned to the one same dbName. This cace, the version of indexedDB will be incremented automatically, and users dont't need take care of "onupgradeneeded".
 
 ```javascript
-// open the database with "dbName/TblName"
+// open the database with "dbName/tableName"
 const local = await Cache("assets/v1");
 
 // List names in database
@@ -168,6 +168,9 @@ const file = await local("tile_01");
 
 // Save a File locally (Setter)
 await local(file); // or await save(file.name, file)
+
+// Delete a File locally
+await local("tile_01", false or null);
 ```
 
 ---
