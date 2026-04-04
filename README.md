@@ -2,7 +2,7 @@
 
 A high-performance bridge between **Cloudflare Edge (R2/Workers)** and **Browser Storage (IndexedDB)**. Optimized for handling heavy binary datasets (GIS, archives, large assets) with zero-latency interaction.
 
-[![Cloudflare Workers](https://img.shields.io/badge/Powered_by-Cloudflare_Workers-F38020?logo=cloudflare-workers&logoColor=white)](https://workers.cloudflare.com/)
+[![Cloudflare Workers](https://img.shields.io/badge/Powered_by-Cloudflare_Workers-F38020?logo=cloudflare-workers&logoColor=white)](https://dash.cloudflare.com/)
 [![Vite](https://img.shields.io/badge/Build_with-Vite-646CFF?logo=vite&logoColor=white)](<https://vitejs.dev/>)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Size](https://img.shields.io/badge/Size-6.6KB-brightgreen.svg)
@@ -23,12 +23,12 @@ Experience the zero-latency data flow and surgical ZIP extraction in action:
 
 ---
 
-## 🚀 Server-Side Setup (Cloudflare Workers)
+## 🚀 Server-Side Setup ([Cloudflare Workers](https://dash.cloudflare.com))
 
 ### 1. Configuration (`wrangler.toml`)
 
-Deploy the backend to handle R2 operations and Proxy requests. The `index.js` automatically manages CORS for you.
-Please edit the file: "wrangler.toml" under worker directory.
+(Sign-up and) deploy the backend to handle R2 operations and Proxy requests. The `index.js` automatically manages CORS for you.
+Please edit the file: "wrangler.toml" under "worker" directory.
 
 ```toml
 name = "native-bucket-api"
@@ -70,7 +70,7 @@ import nativeBucket from './src/index.js';
 The library automatically attaches to `window.nativeBucket` (or `self.nativeBucket`) for non-ESM or direct HTML environments.
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/kenjiyoshidahome2026-bit/native-bucket@latest/src/index.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/kenjiyoshidahome2026-bit/native-bucket@main/dist/native-bucket.iife.js"></script>
 <script>
   window.addEventListener('load', () => { // Access via global nativeBucket after page load
     const { Fetch, Bucket, Cache } = nativeBucket("https://your-worker.dev/");
