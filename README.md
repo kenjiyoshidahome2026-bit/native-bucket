@@ -16,6 +16,13 @@ A high-performance bridge between **Cloudflare Edge (R2/Workers)** and **Browser
 
 ---
 
+## 🎮 Live Demo
+
+Experience the zero-latency data flow and surgical ZIP extraction in action:
+**[👉 View Live Demo](https://[user].github.io/[repo]/demo/)**
+
+---
+
 ## 🚀 Server-Side Setup (Cloudflare Workers)
 
 ### 1. Configuration (`wrangler.toml`)
