@@ -8,5 +8,6 @@ function nativeBucket(apiUrl = null) {
 	PROXY_URL = `${API_BASE}/proxy/`;
 	return {Fetch, Bucket, Cache};
 }
-(typeof window === 'undefined') || (window.nativeBucket = nativeBucket);
+const target = (typeof window === 'undefined')? (typeof self === 'undefined')? null: self : window;
+target && (target.nativeBucket = nativeBucket);
 export default nativeBucket;
