@@ -167,7 +167,7 @@ const list = await local();
 const file = await local("tile_01");
 
 // Save a File locally (Setter)
-await local(file); // or await save(file.name, file)
+await local(file); // or await local(file.name, file);
 
 // Delete a File locally
 await local("tile_01", null);
