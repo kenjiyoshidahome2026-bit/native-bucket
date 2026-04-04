@@ -139,7 +139,7 @@ const meta = await storage.meta("test.txt");
 await storage.move("test.txt", "text.old.txt");
 
 // delete file
-await storage.move("text.old.txt");
+await storage.del("text.old.txt");
 
 // List items in the directory
 const list = await storage.list();
