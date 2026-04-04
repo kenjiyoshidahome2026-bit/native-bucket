@@ -112,7 +112,7 @@ async function exec(event) { if (event) event.preventDefault();
         cmd(`myBucket = new Bucket("gis-data");\nawait myBucket.put(file);`);
         currentPhase = "Compress && Syncing to R2"; 
         progressElement = log(`📡 Progress:`, "warn");
-        const myBucket = new Bucket("gis-data");
+        const myBucket = Bucket("gis-data");
         const t3 = performance.now();
         const size = await myBucket.put(extractedFile);
         const d3 = +(performance.now() - t3).toFixed(0);
