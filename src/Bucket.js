@@ -2,7 +2,7 @@ import {fname2mime} from "./fname2mime.js";
 import {decodeZIP} from "./decodeZIP.js";
 import {encodeZIP} from "./encodeZIP.js";
 export class Bucket {
-	constructor(directory, options = {}, baseUrl) {
+	constructor(baseUrl, directory, options = {}) {
 		const globalScope = typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : null);
 		this.url = baseUrl + directory.replace(/\/$/, "") + "/";
 		this.log = !options.silent;

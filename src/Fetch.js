@@ -4,7 +4,7 @@ import {decodeZIP} from "./decodeZIP.js";
 /**
  * Fetch - スマートプロキシ対応・キャッシュ対策済み通信ユーティリティ
  */
-export async function Fetch(url, opts = {}, baseUrl) {
+export async function Fetch(baseUrl, url, opts = {}) {
     const type = ((typeof opts == "string")? opts: opts.type || "file").toLowerCase();
     const proxy = s => `${baseUrl}?url=${encodeURIComponent(s)}`;
     const encoding = (opts.encoding||"utf8").toLowerCase().replace(/[\-\_]/g,"").replace(/shiftjis/,"sjis");
