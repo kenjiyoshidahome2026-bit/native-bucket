@@ -8,7 +8,7 @@ function nativeBucket(apiUrl = null) {
 	const bucketyOption = opts => ({ baseUrl: `${API_BASE}/bucket/`, ...opts });
     return {
         Fetch: (url, opt = {}) => _Fetch(url, proxyOption(opt)),
-        Bucket: (dir, opts) => _Bucket(dir, bucketyOption(opts)),
+        Bucket: (dir, opts) => new _Bucket(dir, bucketyOption(opts)),
         Cache
     };
 }
