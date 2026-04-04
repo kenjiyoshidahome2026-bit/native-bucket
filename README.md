@@ -98,7 +98,7 @@ A smart proxy that bypasses CORS and can surgically extract specific files from 
 | Parameter | Type | Description |
 | :--- | :---: | :--- |
 | `type` | String | Output format: `"file"` (Default), `"blob"`, `"json"`, `"text"`. |
-| `cors` | Boolean | true/false: pre-flight check widthout this parameter |
+| `cors` | Boolean | true/false: pre-flight check without this parameter |
 | `target` | String | Path inside the ZIP to extract a specific file. |
 | `encoding` | String | encoding (default:`"utf8"`) |
 | `silent` | Boolean | if true then no progress log |
@@ -110,7 +110,7 @@ const zip = await Fetch("https://server.com/data.zip");
 console.log(`Received: ${zip.name} (${zip.size} bytes)`);
 
 // Extract a file from remote ZIP as JSON widthout pre-flight.
-const json = await Fetch("https://server.com/data.zip", { target: "layers/japan.geojson" ,cords:true, type:"json"});
+const json = await Fetch("https://server.com/data.zip", { target: "layers/japan.geojson" ,cors:true, type:"json"});
 console.log(`Received: `, json);
 ```
 
@@ -140,21 +140,21 @@ const meta = await storage.meta("test.txt");
 await storage.move("test.txt", "text.old.txt");
 
 // delete file
-await del.move("text.old.txt");
+await storage.move("text.old.txt");
 
 // List items in the directory
-const files = await storage.list();
+const list = await storage.list();
 
 // read a zip file as file array
-const strage.gets("name");
+const files = await storage.gets("name");
 
 // put a zip file from file array
-const strage.puts(fileArray);
+await storage.puts(fileArray);
 ```
 
 ### ⚡ `Cache(dbName/tableName)`
 
-A persistent Key-Value file store powered by IndexedDB. Perfect for instant subsequent loads with **n-ms network latency**. For categorization, several tableNames can be assigned to the one same dbName. This cace, the version of indexedDB will be incremented automatically, and users dont't need take care of "onupgradeneeded".
+A persistent Key-Value file store powered by IndexedDB. Perfect for instant subsequent loads with **ultra-low latency**. For categorization, several tableNames can be assigned to the one same dbName. This cace, the version of indexedDB will be incremented automatically, and users dont't need take care of "onupgradeneeded".
 
 ```javascript
 // open the database with "dbName/tableName"
@@ -170,7 +170,7 @@ const file = await local("tile_01");
 await local(file); // or await save(file.name, file)
 
 // Delete a File locally
-await local("tile_01", false or null);
+await local("tile_01", null);
 ```
 
 ---
