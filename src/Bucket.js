@@ -2,13 +2,13 @@ import {fname2mime} from "./fname2mime.js";
 import {decodeZIP} from "./decodeZIP.js";
 import {encodeZIP} from "./encodeZIP.js";
 export class Bucket {
-	constructor(directory, options = {}) {
+	constructor(directory, opts = {}) {
 		const globalScope = typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : null);
-		this.baseUrl = options.baseUrl ||`https://api.ortho-earth.com/bucket/`;
+		this.baseUrl = opts.baseUrl ||`https://api.ortho-earth.com/bucket/`;
 		this.directory = directory.replace(/\/$/, "") + "/";
 		this.url = this.baseUrl + this.directory;
-		this.log = !options.silent;
-		this.event = (typeof CustomEvent === 'undefined)')? null: options.eventTarget || globalScope;
+		this.log = !opts.silent;
+		this.event = (typeof CustomEvent === 'undefined)')? null: opts.eventTarget || globalScope;
 	}
 	async _request(path, json = null) {
 		const url = this.url + path.replace(/^\//, "");
