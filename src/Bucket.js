@@ -31,16 +31,18 @@ export class Bucket {
 		ETag = (ETag || "").replace(/"/g, "");
 		return { Key, Size, LastModified, ETag };
 	}
-	async meta(name) {
+	async meta(name) { if (!navigator.onLine) return false;
 		const res = await fetch(this.url + name + "?meta=1");
-		if (!res || !res.ok) return null;
-		const v = await res.json();
-		if (!v || !v.data) return null;
-		return this._conv(v.data);
+		try { if (!res) return false;
+			if (res.status === 404) return null;	
+			const v = await res.json();
+			if (!v || !v.data) return false;
+			return this._conv(v.data);
+		} catch(e) { return false; }
 	}
 	async exist(name) { return !!(await this.meta(name)); }
 	async size(name) { const q = await this.meta(name); return q ? q.Size : 0; }
-	async etag(name) { const q = await this.meta(name); return q ? q.ETag : null; }
+	async etag(name) { const q = await this.meta(name); return q === false? q: q? q.ETag : null; }
 	async list() {
 		let allItems = [], continuationToken = null, isTruncated = true;
 		while (isTruncated) {
