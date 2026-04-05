@@ -11,6 +11,15 @@ export class Bucket {
 		this.event = (typeof CustomEvent === 'undefined)')? null: opts.eventTarget || globalScope;
 	}
 	offline() { return !(typeof navigator === 'undefined' && navigator.onLine); }
+	async isAlive() { if (this.offline()) return false;
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 2000);
+            const result = await this._request('', { action:"list", limit:1, signal: controller.signal });
+            clearTimeout(timeout);
+            return !!result;
+        } catch (e) { return false; }
+    }
 	async _request(path, json = null) {
 		const url = this.url + path.replace(/^\//, "");
 		const headers = { 'Content-Type': 'application/json' };
