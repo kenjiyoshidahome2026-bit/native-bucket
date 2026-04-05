@@ -10,6 +10,7 @@ export class Bucket {
 		this.log = !opts.silent;
 		this.event = (typeof CustomEvent === 'undefined)')? null: opts.eventTarget || globalScope;
 	}
+	offline() { return !(typeof navigator === 'undefined' && navigator.onLine); }
 	async _request(path, json = null) {
 		const url = this.url + path.replace(/^\//, "");
 		const headers = { 'Content-Type': 'application/json' };
@@ -31,7 +32,7 @@ export class Bucket {
 		ETag = (ETag || "").replace(/"/g, "");
 		return { Key, Size, LastModified, ETag };
 	}
-	async meta(name) { if (!navigator.onLine) return false;// オフラインの場合は常にfalseを返す
+	async meta(name) { if (this.offline()) return false;// オフラインの場合は常にfalseを返す
 		const res = await fetch(this.url + name + "?meta=1");
 		try { if (!res) return false;
 			if (res.status === 404) return null;	
@@ -40,13 +41,14 @@ export class Bucket {
 			return this._conv(v.data);
 		} catch(e) { return false; }
 	}
+	
 	async exist(name) { return !!(await this.meta(name)); }
 	async size(name) { const q = await this.meta(name); return q ? q.Size : 0; }
 	async etag(name) { const q = await this.meta(name); return q === false? q: q? q.ETag : null; }
-	async list() {
+	async list(limit = Infinity) {
 		let allItems = [], continuationToken = null, isTruncated = true;
-		while (isTruncated) {
-			const res = await this._request("", { action: 'list', continuationToken });
+		while (isTruncated && allItems.length < limit) {
+			const res = await this._request("", { action: 'list', continuationToken, limit: Math.min(limit - allItems.length, 1000) });
 			if (!res) break;
 			const items = (res.Contents || []).map(i => ({
 				...i, Key: i.Key?.split("/").pop(), ETag: i.ETag?.replace(/"/g, "")

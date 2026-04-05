@@ -9,8 +9,11 @@ function nativeBucket(apiUrl = null) {
     return {
         Fetch: (url, opt = {}) => _Fetch(url, proxyOption(opt)),
         Bucket: async function(dir, opts) { const instance = new _Bucket(dir, bucketyOption(opts)); 
-      		try { await instance.list({ limit: 1 }); return instance;
-			} catch (e) { throw new Error(`[native-bucket] Failed to connect to Bucket "${dir}" at ${BUCKET_URL}.`);}
+      		try { await instance.list(1); return instance;
+			} catch (e) {
+                console.warn(`[native-bucket] Failed to connect to Bucket "${dir}" at ${BUCKET_URL}.`);
+                return instance.offline()? false: null;
+            }
 		},
         Cache
     };
