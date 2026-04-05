@@ -31,7 +31,7 @@ export class Bucket {
 		ETag = (ETag || "").replace(/"/g, "");
 		return { Key, Size, LastModified, ETag };
 	}
-	async meta(name) { if (!navigator.onLine) return false;
+	async meta(name) { if (!navigator.onLine) return false;// オフラインの場合は常にfalseを返す
 		const res = await fetch(this.url + name + "?meta=1");
 		try { if (!res) return false;
 			if (res.status === 404) return null;	
