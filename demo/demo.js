@@ -99,11 +99,11 @@ async function exec(event) { if (event) event.preventDefault();
         await delay(1000);
     ////-------------------------------------------------------------------------------------------  
         step("Pinpoint Extraction (Smart Extract)");
-        const t2 = performance.now();
         const targetFile= "N03-20250101.geojson";
+        cmd(`const targetFile = "${targetFile}";\nconst file = await Fetch(targetURL, { target: targetFile });`);
+        const t2 = performance.now();
         const extractedFile = await Fetch(targetURL, { target: targetFile, cors: true });
         const d2 = +(performance.now() - t2).toFixed(0);
-        cmd(`const targetFile = "${targetFile}";\nconst file = await Fetch(targetURL, { target: targetFile });`);
         log(`🚀 [RESULT] Smart Extract Performance: <span class="highlight-speed">${d2.toLocaleString()}ms</span>`, "success");
         log(`📊 Extracted File Size: ${extractedFile.size.toLocaleString()} bytes`, "info");
         await delay(1000);
