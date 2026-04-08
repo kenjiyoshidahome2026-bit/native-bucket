@@ -1,6 +1,26 @@
 import {fname2mime} from "./fname2mime.js";
 import {decodeZIP} from "./decodeZIP.js";
 import {encodeZIP} from "./encodeZIP.js";
+export async function isGzip(file) {
+    if (!(file instanceof Blob && file.size > 10)) return false;
+    const buf = new Uint8Array(await file.slice(0, 2).arrayBuffer());
+    return buf[0] === 0x1f && buf[1] === 0x8b;
+}
+export async function gunzip(file) {
+    if (file instanceof Blob && await isGzip(file)) {
+        const name = file.name.replace(/\.(gz|gzip)$/i,"");
+        const stream = file.stream().pipeThrough(new DecompressionStream("gzip"));
+        return new File([await new Response(stream).blob()], name, {type:"application/octet-stream"});
+    }
+    return file;
+}
+export async function gzip(file) {
+    if (file instanceof Blob && !(await isGzip(file))) {
+        const stream = new Response(file).body.pipeThrough(new CompressionStream("gzip"));
+        return new File([await new Response(stream).blob()], file.name+".gz", {type:"application/gzip"});
+    }
+    return file;
+}
 export class Bucket {
 	constructor(directory, opts = {}) {
 		const globalScope = typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : null);
@@ -84,11 +104,7 @@ export class Bucket {
 				if (xhr.status !== 200) return handleError();
 				let blob = xhr.response;
 				this._log(` => total loaded: ${blob.size.toLocaleString()} bytes`);
-				const header = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
-				if (blob.size >= 10 && header[0] === 0x1f && header[1] === 0x8b) {
-					const stream = blob.stream().pipeThrough(new DecompressionStream("gzip"));
-					blob = await new Response(stream).blob();
-				}
+				blob = gunzip(blob);
 				this._log(` => total expanded: ${blob.size.toLocaleString()} bytes`);
 				blob = new Blob([blob],{type: fname2mime(name)});
 				blob.name = name;
@@ -108,7 +124,7 @@ export class Bucket {
 		const compressed = ['zip','gz','7z','rar','tar','tgz','pdf','epub',
 			'jpg','jpeg','png','gif','webp','mp4','mkv','mov','avi','webm','mp3','ogg','wav','flac'];
 		const extension = name.split('.').pop().toLowerCase();
-		const compressible = !compressed.includes(extension);
+		const compressible = !compressed.includes(extension) && !isGzip(file);
 		const targetUrl = this.url + name.replace(/^\//, "");
 		const sizeThreshold = 5 * 1024 * 1024; // 5MB単位
 		const rawStream = file.stream();
