@@ -6,10 +6,10 @@ export async function isGzip(file) {
 }
 export async function gunzip(file) {
     if (!(file instanceof Blob) || !(await isGzip(file))) return file;
-    const name = file.name.replace(/\.(gz|gzip)$/i, "");
+    const name = file.name? file.name.replace(/\.(gz|gzip)$/i, ""): null;
     const stream = file.stream().pipeThrough(new DecompressionStream("gzip"));
     try { const blob = await new Response(stream).blob();
-        return new File([blob], name, { type: fname2mime(name) });
+        return name? new File([blob], name, { type: fname2mime(name) }): blob;
     } catch (e) {
         console.error("解凍エラー: メモリ不足の可能性があります", e);
         throw e;
