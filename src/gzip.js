@@ -1,3 +1,4 @@
+import {fname2mime} from "./fname2mime.js";
 export async function isGzip(file) {
     if (!(file instanceof Blob) || file.size < 10) return false;
     const buf = new Uint8Array(await file.slice(0, 2).arrayBuffer());
@@ -8,7 +9,7 @@ export async function gunzip(file) {
     const name = file.name.replace(/\.(gz|gzip)$/i, "");
     const stream = file.stream().pipeThrough(new DecompressionStream("gzip"));
     try { const blob = await new Response(stream).blob();
-        return new File([blob], name, { type: "application/octet-stream" });
+        return new File([blob], name, { type: fname2mime(name) });
     } catch (e) {
         console.error("解凍エラー: メモリ不足の可能性があります", e);
         throw e;
