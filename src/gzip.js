@@ -14,7 +14,7 @@ export async function gunzip(file) {
         throw e;
     }
 }
-export async function gzip(file) { cponsole.log("gzip");
+export async function gzip(file) { //console.log("gzip");
     if (!(file instanceof Blob) || (await isGzip(file))) return file;
     const stream = file.stream().pipeThrough(new CompressionStream("gzip"));
     try { const blob = await new Response(stream).blob();
