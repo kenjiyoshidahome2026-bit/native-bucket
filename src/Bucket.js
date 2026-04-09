@@ -85,7 +85,7 @@ export class Bucket {
 				if (xhr.status !== 200) return handleError();
 				let blob = xhr.response;
 				this._log(` => total loaded: ${blob.size.toLocaleString()} bytes`);
-				blob = gunzip(blob);
+				blob = await gunzip(blob);
 				this._log(` => total expanded: ${blob.size.toLocaleString()} bytes`);
 				blob = new Blob([blob],{type: fname2mime(name)});
 				blob.name = name;
