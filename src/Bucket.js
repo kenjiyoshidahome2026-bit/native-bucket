@@ -106,12 +106,13 @@ export class Bucket {
 			'jpg','jpeg','png','gif','webp','mp4','mkv','mov','avi','webm','mp3','ogg','wav','flac'];
 		const extension = name.split('.').pop().toLowerCase();
 		const compressible = !compressed.includes(extension) && !isGzip(file);
+		compressible && (file = await gzip(file));
 		const targetUrl = this.url + name.replace(/^\//, "");
 		const sizeThreshold = 5 * 1024 * 1024; // 5MB単位
-		const rawStream = file.stream();
-		const reader = (compressible? rawStream.pipeThrough(new CompressionStream('gzip')): rawStream).getReader();
+		const reader = file.stream().getReader();
 		let headers = { 'X-Action': 'mp-create', 'X-Metadata-Type': file.type || 'application/octet-stream' };
 		if (compressible) headers['X-Content-Encoding'] = "gzip";
+
 		const total = `${file.size.toLocaleString()}${compressible? " (compressing)":""}`; 
 		const log = len => {
 			this._log(` <= ${name}: ${len.toLocaleString()} / ${total} bytes`);
