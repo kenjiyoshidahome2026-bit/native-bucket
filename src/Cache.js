@@ -15,7 +15,7 @@ export async function Cache(name) {
 		const tx = _cacheTub[dbname].transaction([tblname], "readonly");
 		const tbl = tx.objectStore(tblname);
 		const req = (key === undefined) ? tbl.getAllKeys() : tbl.get(key);
-		req.onsuccess = () => { key && (req.result.name = key); resolve(req.result); }
+		req.onsuccess = () => { key && req.result && (req.result.name = key); resolve(req.result); }
 		req.onerror = e => reject(e.target.error);
 	});
 	const put = (key, val) => new Promise((resolve, reject) => {
