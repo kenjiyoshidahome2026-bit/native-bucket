@@ -1,7 +1,7 @@
 export async function isGzip(file) {
-    if (!(file instanceof Blob && file.size > 10)) return false;
+    if (!(file instanceof Blob) || file.size < 10) return false;
     const buf = new Uint8Array(await file.slice(0, 2).arrayBuffer());
-    return buf[0] === 0x1f && buf[1] === 0x8b;
+    return (buf[0] === 0x1f && buf[1] === 0x8b);
 }
 export async function gunzip(file) {
     if (file instanceof Blob && await isGzip(file)) {
