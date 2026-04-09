@@ -105,7 +105,7 @@ export class Bucket {
 		const compressed = ['zip','gz','7z','rar','tar','tgz','pdf','epub',
 			'jpg','jpeg','png','gif','webp','mp4','mkv','mov','avi','webm','mp3','ogg','wav','flac'];
 		const extension = name.split('.').pop().toLowerCase();
-		const compressible = !compressed.includes(extension) && !isGzip(file);
+		const compressible = !compressed.includes(extension) && !(await isGzip(file));
 		compressible && (file = await gzip(file));
 		const targetUrl = this.url + name.replace(/^\//, "");
 		const sizeThreshold = 5 * 1024 * 1024; // 5MB単位
