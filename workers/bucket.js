@@ -1,10 +1,10 @@
 export async function bucket(request, bucket) {
     const url = new URL(request.url);
-    const path = decodeURIComponent(url.pathname.replace(/^\/bucket\//, "")); // パス調整
-    try {
+    const path = decodeURIComponent(url.pathname.split('/bucket/').pop());
+     try {
         if (request.method === "GET") {
             const isMeta = url.searchParams.has("meta");
-            const obj = await (isMeta ? bucket.head(path) : bucket.get(path));
+            const obj = await (isMeta ? bucket.head(path) : bucket.get(path));           
             if (!obj) return new Response(JSON.stringify({ data: null }), { status: 404 });
             if (isMeta) {
                 const meta = { 

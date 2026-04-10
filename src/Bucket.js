@@ -9,9 +9,9 @@ export class Bucket {
 		this.directory = directory.replace(/\/$/, "") + "/";
 		this.url = this.baseUrl + this.directory;
 		this.log = !opts.silent;
-		this.event = (typeof CustomEvent === 'undefined)')? null: opts.eventTarget || globalScope;
+		this.event = (typeof CustomEvent === 'undefined')? null: opts.eventTarget || globalScope;
 	}
-	offline() { return !(typeof navigator === 'undefined' && navigator.onLine); }
+	offline() { return typeof navigator !== 'undefined' && navigator.onLine === false; }
 	async isAlive() { if (this.offline()) return false;
         try {
             const controller = new AbortController();
@@ -42,16 +42,18 @@ export class Bucket {
 		ETag = (ETag || "").replace(/"/g, "");
 		return { Key, Size, LastModified, ETag };
 	}
-	async meta(name) { if (this.offline()) return false;// オフラインの場合は常にfalseを返す
-		const res = await fetch(this.url + name + "?meta=1");
-		try { if (!res) return false;
-			if (res.status === 404) return null;	
-			const v = await res.json();
-			if (!v || !v.data) return false;
-			return this._conv(v.data);
-		} catch(e) { return false; }
-	}
-	
+async meta(name) { 
+        if (this.offline()) return false;
+        // Worker側の実装(bucket.js)に合わせて ?meta=1 を付与
+        try {
+            const res = await fetch(this.url + name + "?meta=1");
+            if (!res || res.status === 404) return null;
+            if (!res.ok) return false;
+            const v = await res.json();
+            if (!v || !v.data) return false;
+            return this._conv(v.data);
+        } catch(e) { return false; }
+    }	
 	async exist(name) { return !!(await this.meta(name)); }
 	async size(name) { const q = await this.meta(name); return q ? q.Size : 0; }
 	async etag(name) { const q = await this.meta(name); return q === false? q: q? q.ETag : null; }
