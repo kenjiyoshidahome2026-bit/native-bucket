@@ -108,7 +108,7 @@ export class Bucket {
 		const compressible = !compressed.includes(extension) && !(await isGzip(file));
 		compressible && (file = await gzip(file));
 		const targetUrl = this.url + name.replace(/^\//, "");
-		const sizeThreshold = 10 * 1024 * 1024; // 10MB単位
+		const sizeThreshold = 5 * 1024 * 1024; // 5MB単位
 		const reader = file.stream().getReader();
 		let headers = { 'X-Action': 'mp-create', 'X-Metadata-Type': file.type || 'application/octet-stream' };
 		if (compressible) headers['X-Content-Encoding'] = "gzip";
