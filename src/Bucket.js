@@ -24,6 +24,7 @@ export class Bucket {
 	async _request(path, json = null) {
 		const url = this.url + path.replace(/^\//, "");
 		const headers = { 'Content-Type': 'application/json' };
+		json && json.action && (headers['X-Action'] = json.action);
 		const options = json ? { method: 'POST', headers, body: JSON.stringify(json) } : { method: 'GET' };
 		try {
 			const res = await fetch(url, options);
@@ -42,9 +43,8 @@ export class Bucket {
 		ETag = (ETag || "").replace(/"/g, "");
 		return { Key, Size, LastModified, ETag };
 	}
-async meta(name) { 
+	async meta(name) { 
         if (this.offline()) return false;
-        // Worker側の実装(bucket.js)に合わせて ?meta=1 を付与
         try {
             const res = await fetch(this.url + name + "?meta=1");
             if (!res || res.status === 404) return null;

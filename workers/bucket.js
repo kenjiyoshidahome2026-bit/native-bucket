@@ -57,7 +57,12 @@ export async function bucket(request, bucket) {
             }
             if (action === "list") {
                 const body = await request.json().catch(() => ({}));
-                const list = await bucket.list({ prefix: path || undefined, cursor: body.continuationToken || undefined });
+                // path が空（バケット直下）でも動作するように prefix を調整
+                const list = await bucket.list({ 
+                    prefix: path || undefined, 
+                    cursor: body.continuationToken || undefined,
+                    limit: body.limit || 1
+                });
                 return new Response(JSON.stringify({
                     data: {
                         Contents: (list.objects || []).map(o => ({ 
@@ -67,7 +72,7 @@ export async function bucket(request, bucket) {
                         IsTruncated: list.truncated,
                         NextContinuationToken: list.cursor || null
                     }
-                }));
+                }), { headers: { "Content-Type": "application/json" } });
             }
         }
     } catch (e) {
