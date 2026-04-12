@@ -4,7 +4,8 @@ export async function decodeZIP(source, target = null, encoding = null) {//åŸºæœ
 		try { const r = await fetch(url, opt); return (!r.ok && r.status !== 206) ? null : r; } catch (e) { return null; }
 	};
 	const parseDosDate = (d, t) => new Date(((d >> 9) & 127) + 1980, ((d >> 5) & 15) - 1, d & 31, (t >> 11) & 31, (t >> 5) & 63, (t & 31) * 2).getTime();
-	let isFile = source instanceof Blob, totalLength = 0;
+	const isBlob = (q) => q && typeof q.size === 'number' && typeof q.slice === 'function';
+	let isFile = isBlob(source), totalLength = 0;
 	if (isFile) {
 		totalLength = source.size;
 	} else {
