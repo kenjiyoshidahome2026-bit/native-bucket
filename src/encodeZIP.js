@@ -50,6 +50,7 @@ export async function encodeZIP(files, name = null) {
 	ev.setUint32(0, 0x06054B50, true);
 	ev.setUint16(8, cd.length, true); ev.setUint16(10, cd.length, true);
 	ev.setUint32(12, off - cdStart, true); ev.setUint32(16, cdStart, true);
+	parts.push(eocd);
 	const type = 'application/zip';
 	return name? new File(parts, name, { type }): new Blob(parts, { type });
 }
