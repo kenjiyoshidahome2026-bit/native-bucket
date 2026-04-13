@@ -25,3 +25,13 @@ export async function gzip(file) { //console.log("gzip");
         throw e;
     }
 }
+async function raw(data, flag) {
+    const stream = flag ? CompressionStream : DecompressionStream;
+    const ds = new stream('deflate-raw');
+    const writer = ds.writable.getWriter();
+    await writer.write(data); writer.close();
+    const response = new Response(ds.readable);
+    return new Uint8Array(await response.arrayBuffer());
+}
+export async function deflateRaw(data) { return raw(data, true); }
+export async function inflateRaw(data) { return raw(data, false); }
